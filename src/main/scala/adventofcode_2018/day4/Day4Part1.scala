@@ -32,14 +32,9 @@ object Day4Part1 {
   }
 
   case class Record(time: LocalDateTime, act: GuardAct) {
-    override def toString: String = {
-      val logInfo = act match {
-        case OnDuty(id)  ⇒ s"Guard #$id begins shift"
-        case FallsAsleep ⇒ "falls asleep"
-        case WakesUp     ⇒ "wakes up"
-      }
-
-      s"[$time] $logInfo"
+    def isStartDuty: Boolean = act match {
+      case _: OnDuty ⇒ true
+      case _         ⇒ false
     }
   }
 
@@ -61,7 +56,7 @@ object Day4Part1 {
   }
 
   object StatsLogic {
-    def calculateSleepStats(accums: (SleepStats, Option[Record]), record: Record): (SleepStats, Option[Record]) = {
+    def calculateSleep(accums: (SleepStats, Option[Record]), record: Record): (SleepStats, Option[Record]) = {
       val (stats, sleepRecord) = accums
       record.act match {
         case FallsAsleep ⇒ (stats, Some(record))
@@ -74,20 +69,25 @@ object Day4Part1 {
       }
     }
 
-    def registerRecord(accums: (GuardsStats, Duty), record: Record): (GuardsStats, Duty) = {
-      val (statsSummary, duty) = accums
-      if (duty.nonEmpty) {
-        record.act match {
-          case _: OnDuty ⇒
-            val guardId = duty.head.act.asInstanceOf[OnDuty].id
-            val (stats, _) = duty.foldLeft(SleepStats.empty, Option.empty[Record])(calculateSleepStats)
-            val updatedStats = statsSummary.get(guardId).fold(stats)(stats.update)
-            (statsSummary.updated(guardId, updatedStats), List(record))
+    def groupRecords(accums: (Map[GuardId, Duty], GuardId), record: Record): (Map[GuardId, Duty], GuardId) = {
+      val (duties, currentId) = accums
+      val guardId = record.act match {
+        case OnDuty(i) ⇒ i
+        case _         ⇒ currentId
+      }
+      val duty = duties.get(guardId).fold(List(record))(_ :+ record)
+      (duties.updated(guardId, duty), guardId)
+    }
 
-          case _: GuardAct ⇒ (statsSummary, duty :+ record)
-        }
-      } else {
-        (statsSummary, duty :+ record)
+    def calculateStats(inputs: List[String]): GuardsStats = {
+      val records: Seq[Record] = inputs.map(Record.fromInput).sorted
+
+      val (guardsDuties, _) = records.foldLeft(Map.empty[GuardId, Duty], 0)(groupRecords)
+
+      guardsDuties.map {
+        case (guardId, duty) ⇒
+          val (stats, _) = duty.foldLeft(SleepStats.empty, Option.empty[Record])(calculateSleep)
+          guardId -> stats
       }
     }
   }
@@ -100,7 +100,7 @@ object Day4Part1 {
     def calculateSleepTime(from: LocalDateTime, to: LocalDateTime): (Int, MinutesStats) = {
       val minutes = minutesPassed(from, to)
 
-      val minutesStats = (0 to minutes)
+      val minutesStats = (0 until minutes)
         .map(from.plusMinutes(_).getMinute)
         .groupBy(m ⇒ m)
         .mapValues(_.size)
@@ -130,8 +130,7 @@ object Day4Part1 {
   def solve(inputs: List[String]): Int = {
     import StatsLogic._
 
-    val records: Seq[Record] = inputs.map(Record.fromInput).sorted
-    val (guardsStats, _) = records.foldLeft[(GuardsStats, Duty)](Map.empty, List.empty)(registerRecord)
+    val guardsStats = calculateStats(inputs)
 
     val (id, stats) = guardsStats.maxBy(_._2.sleepTotal)
     val mostSleepMinute = stats.sleepMinutes.maxBy(_._2)._1

@@ -1,7 +1,7 @@
 package adventofcode_2018
 
 import adventofcode_2018.day3.{ Day3Part1, Day3Part2 }
-import adventofcode_2018.day4.Day4Part1
+import adventofcode_2018.day4.{ Day4Part1, Day4Part2 }
 
 import scala.io.{ Source, StdIn }
 
@@ -38,16 +38,18 @@ object Main extends App {
     throw new IllegalArgumentException("Path can't be empty")
   }
 
+  val input = loadInput(path)
+
   val result = day match {
     case 3 ⇒
       part match {
-        case 1 ⇒ Day3Part1.solve(loadInput(path))
-        case 2 ⇒ Day3Part2.solve(loadInput(path))
+        case 1 ⇒ Day3Part1.solve(input)
+        case 2 ⇒ Day3Part2.solve(input)
       }
     case 4 ⇒
       part match {
-        case 1 ⇒ Day4Part1.solve(loadInput(path))
-        case _ ⇒ NoSolutionMsg
+        case 1 ⇒ Day4Part1.solve(input)
+        case 2 ⇒ Day4Part2.solve(input)
       }
 
     case _ ⇒ NoSolutionMsg
