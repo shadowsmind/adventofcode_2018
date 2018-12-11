@@ -1,6 +1,7 @@
 package adventofcode_2018
 
 import adventofcode_2018.day3.{ Day3Part1, Day3Part2 }
+import adventofcode_2018.day4.Day4Part1
 
 import scala.io.{ Source, StdIn }
 
@@ -43,6 +44,12 @@ object Main extends App {
         case 1 ⇒ Day3Part1.solve(loadInput(path))
         case 2 ⇒ Day3Part2.solve(loadInput(path))
       }
+    case 4 ⇒
+      part match {
+        case 1 ⇒ Day4Part1.solve(loadInput(path))
+        case _ ⇒ NoSolutionMsg
+      }
+
     case _ ⇒ NoSolutionMsg
   }
 
