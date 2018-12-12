@@ -2,6 +2,7 @@ package adventofcode_2018
 
 import adventofcode_2018.day3.{ Day3Part1, Day3Part2 }
 import adventofcode_2018.day4.{ Day4Part1, Day4Part2 }
+import adventofcode_2018.day5.{ Day5Part1, Day5Part2 }
 
 import scala.io.{ Source, StdIn }
 
@@ -50,6 +51,11 @@ object Main extends App {
       part match {
         case 1 ⇒ Day4Part1.solve(input)
         case 2 ⇒ Day4Part2.solve(input)
+      }
+    case 5 ⇒
+      part match {
+        case 1 ⇒ Day5Part1.solve(input.head)
+        case 2 ⇒ Day5Part2.solve(input.head)
       }
 
     case _ ⇒ NoSolutionMsg
