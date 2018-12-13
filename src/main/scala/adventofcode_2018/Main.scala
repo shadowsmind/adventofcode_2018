@@ -1,5 +1,6 @@
 package adventofcode_2018
 
+import adventofcode_2018.day1.{ Day1Part1, Day1Part2 }
 import adventofcode_2018.day3.{ Day3Part1, Day3Part2 }
 import adventofcode_2018.day4.{ Day4Part1, Day4Part2 }
 import adventofcode_2018.day5.{ Day5Part1, Day5Part2 }
@@ -42,6 +43,11 @@ object Main extends App {
   val input = loadInput(path)
 
   val result = day match {
+    case 1 ⇒
+      part match {
+        case 1 ⇒ Day1Part1.solve(input)
+        case 2 ⇒ Day1Part2.solve(input)
+      }
     case 3 ⇒
       part match {
         case 1 ⇒ Day3Part1.solve(input)
